@@ -1,3 +1,3 @@
-export class SignupUserResponseDto {
+export class SignUpUserResponseDto {
   createdUserUuid: string;
 }

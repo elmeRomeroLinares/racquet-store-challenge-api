@@ -4,7 +4,7 @@ import * as bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRole } from './enums/user-role.enum';
-import { SignupUserResponseDto } from './dto/signup-user-response.dto';
+import { SignUpUserResponseDto } from './dto/signup-user-response.dto';
 
 jest.mock('bcryptjs');
 jest.mock('uuid');
@@ -34,7 +34,7 @@ describe('AuthenticationService', () => {
       const hashedPassword = 'hashedPassword';
       const uuid = 'test-uuid';
 
-      const signupUserResponse: SignupUserResponseDto = {
+      const signupUserResponse: SignUpUserResponseDto = {
         createdUserUuid: uuid,
       };
 

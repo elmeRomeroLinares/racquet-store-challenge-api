@@ -5,11 +5,14 @@ import {
   ValidationPipe,
   Headers,
   ForbiddenException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRole } from './enums/user-role.enum';
-import { SignupUserResponseDto } from './dto/signup-user-response.dto';
+import { SignUpUserResponseDto } from './dto/signup-user-response.dto';
+import { SignInUserDto } from './dto/signin-user.dto';
+import { SignInUserResponse } from './dto/signin-user-response.dto';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -19,7 +22,7 @@ export class AuthenticationController {
   async signUp(
     @Body(new ValidationPipe()) createUserDto: CreateUserDto,
     @Headers('Store-Key') storeKey?: string,
-  ): Promise<SignupUserResponseDto> {
+  ): Promise<SignUpUserResponseDto> {
     const adminStoreKey = process.env.ADMIN_STORE_KEY;
 
     if (storeKey) {
@@ -33,5 +36,19 @@ export class AuthenticationController {
     }
 
     return this.authService.signUp(createUserDto);
+  }
+
+  @Post('signin')
+  async signIn(
+    @Body(new ValidationPipe()) signInUserDto: SignInUserDto,
+  ): Promise<SignInUserResponse> {
+    const user = await this.authService.validateUser(signInUserDto);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const accessToken = await this.authService.createAccessToken(user.id);
+    return { accessToken };
   }
 }
