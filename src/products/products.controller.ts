@@ -26,7 +26,8 @@ export class ProductsController {
   @UseGuards(JwtAuthenticationGuard, RolesGuard)
   @Roles(UserRole.Admin)
   async createProductCategory(
-    @Body() createProductCategoryDto: CreateProductCategoryDto,
+    @Body(new ValidationPipe())
+    createProductCategoryDto: CreateProductCategoryDto,
   ): Promise<CreateProductCategoryResponseDto> {
     return await this.productsService.createProductCategory(
       createProductCategoryDto,
