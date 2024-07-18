@@ -1,6 +1,6 @@
 import { UserRole } from '../enums/user-role.enum';
 
-export class SignUpUserResponseDto {
-  createdUserUuid: string;
+export class JWTPayload {
+  sub: string;
   role: UserRole;
 }

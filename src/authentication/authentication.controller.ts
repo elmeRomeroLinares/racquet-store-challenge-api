@@ -48,7 +48,10 @@ export class AuthenticationController {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const accessToken = await this.authService.createAccessToken(user.id);
+    const accessToken = await this.authService.createAccessToken(
+      user.id,
+      user.role,
+    );
     return { accessToken };
   }
 }

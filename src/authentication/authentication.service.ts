@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { SignInUserDto } from './dto/signin-user.dto';
 import { JwtService } from '@nestjs/jwt';
+import { UserRole } from './enums/user-role.enum';
+import { JWTPayload } from './dto/jwt-payload.dto';
 
 @Injectable()
 export class AuthenticationService {
@@ -23,7 +25,7 @@ export class AuthenticationService {
       password: hashedPassword,
     });
     const newUser = await this.usersRepository.save(user);
-    return { createdUserUuid: newUser.id };
+    return { createdUserUuid: newUser.id, role: newUser.role };
   }
 
   async validateUser(signInUserDto: SignInUserDto): Promise<User | null> {
@@ -36,8 +38,8 @@ export class AuthenticationService {
     return null;
   }
 
-  async createAccessToken(userId: string): Promise<string> {
-    const payload = { sub: userId };
+  async createAccessToken(userId: string, userRole: UserRole): Promise<string> {
+    const payload: JWTPayload = { sub: userId, role: userRole };
     return this.jwtService.sign(payload);
   }
 }
