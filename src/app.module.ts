@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { User } from './authentication/entities/user.entity';
 import { ProductsModule } from './products/products.module';
 import { ProductCategory } from './products/entities/product-category.entity';
+import { Product } from './products/entities/product.entity';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { ProductCategory } from './products/entities/product-category.entity';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [User, ProductCategory],
+        entities: [User, ProductCategory, Product],
         synchronize: true, // set to false in production
       }),
       inject: [ConfigService],
