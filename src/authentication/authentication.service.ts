@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SignUpUserResponseDto } from './dto/signup-user-response.dto';
@@ -20,6 +20,12 @@ export class AuthenticationService {
 
   async signUp(createUserDto: CreateUserDto): Promise<SignUpUserResponseDto> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const existingUser = await this.usersRepository.findOne({
+      where: { username: createUserDto.username },
+    });
+    if (existingUser) {
+      throw new ConflictException('Username already in use')
+    }
     const user = this.usersRepository.create({
       ...createUserDto,
       password: hashedPassword,

@@ -5,6 +5,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as dotenv from 'dotenv';
 import { SignUpUserResponseDto } from './dto/signup-user-response.dto';
+import { UserRole } from './enums/user-role.enum';
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ describe('AuthenticationController', () => {
     it('should sign up a user as Admin if Store-Key matches', async () => {
       const result: SignUpUserResponseDto = {
         createdUserUuid: 'test-uuid',
+        role: UserRole.Admin,
       };
       jest.spyOn(authenticationService, 'signUp').mockResolvedValue(result);
 
@@ -59,6 +61,7 @@ describe('AuthenticationController', () => {
     it('should sign up a user as Customer if Store-Key is not provided', async () => {
       const result: SignUpUserResponseDto = {
         createdUserUuid: 'test-uuid',
+        role: UserRole.Customer,
       };
       jest.spyOn(authenticationService, 'signUp').mockResolvedValue(result);
 

@@ -14,7 +14,6 @@ import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { CreateProductResponseDto } from './dto/create-product-response.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { timeStamp } from 'console';
 import { DeleteProductResponseDto } from './dto/delete-product-response.dto';
 import { PaginatedProductsQueryDto } from './dto/paginated-products-query.dto';
 

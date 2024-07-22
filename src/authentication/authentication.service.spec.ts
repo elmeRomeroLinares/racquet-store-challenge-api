@@ -36,6 +36,7 @@ describe('AuthenticationService', () => {
 
       const signupUserResponse: SignUpUserResponseDto = {
         createdUserUuid: uuid,
+        role: UserRole.Customer,
       };
 
       (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
