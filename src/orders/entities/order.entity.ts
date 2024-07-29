@@ -1,45 +1,34 @@
+import { User } from 'src/authentication/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  CreateDateColumn,
-  ManyToMany,
-  JoinTable,
   ManyToOne,
+  OneToMany,
+  CreateDateColumn,
 } from 'typeorm';
-import { Product } from '../../products/entities/product.entity';
-import { User } from 'src/authentication/entities/user.entity';
-import { OrderStatus } from '../enums/order-status.enum';
+import { OrderItem } from './order-item.entity';
+
+export enum OrderStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  CANCELED = 'CANCELED',
+}
 
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToMany(() => Product, (product) => product.orders)
-  @JoinTable({
-    name: 'order_products',
-    joinColumn: {
-      name: 'order',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'product',
-      referencedColumnName: 'id',
-    },
-  })
-  products: Product[];
-
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.orders)
   user: User;
 
-  @CreateDateColumn()
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
+  items: OrderItem[];
+
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @Column({
-    type: 'enum',
-    enum: OrderStatus,
-    default: OrderStatus.Pending,
-  })
+  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING })
   status: OrderStatus;
 }

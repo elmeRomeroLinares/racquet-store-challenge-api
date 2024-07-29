@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Timestamp } from 'typeorm';
 import { CreateProductCategoryDto } from './dto/create-product-category.dto';
 import { CreateProductCategoryResponseDto } from './dto/create-product-category-response.dto';
-import { ProductCategory } from './entities/product-category.entity';
+import { ProductCategory } from './entities/category.entity';
 import { PaginationQueryDto } from 'src/pagination/dto/pagination-query.dto';
 import { PaginatedResultDto } from 'src/pagination/dto/paginated-result.dto';
 import { Product } from './entities/product.entity';

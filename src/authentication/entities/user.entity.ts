@@ -1,5 +1,21 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { UserRole } from '../enums/user-role.enum';
+import { Cart } from 'src/cart/entities/cart.entity';
+import { Order } from 'src/orders/entities/order.entity';
+import { Product } from 'src/products/entities/product.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
+
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+  GUEST = 'GUEST',
+}
 
 @Entity()
 export class User {
@@ -17,4 +33,14 @@ export class User {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
+
+  @OneToOne(() => Cart, (cart) => cart.user)
+  cart: Cart;
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
+
+  @ManyToMany(() => Product, (product) => product.likedBy)
+  @JoinTable()
+  likedProducts: Product[];
 }

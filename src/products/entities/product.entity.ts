@@ -5,10 +5,11 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
   ManyToMany,
 } from 'typeorm';
-import { ProductCategory } from './product-category.entity';
-import { Order } from 'src/orders/entities/order.entity';
+import { Category } from './category.entity';
+import { User } from 'src/authentication/entities/user.entity';
 
 @Entity()
 export class Product {
@@ -21,21 +22,22 @@ export class Product {
   @Column('decimal')
   price: number;
 
-  @Column()
-  image_url: string;
+  @Column({ nullable: true })
+  imageUrl?: string;
 
   @Column({ default: false })
   disabled: boolean;
 
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', nullable: true, default: null })
-  modified_at: Date | null;
+  @UpdateDateColumn({ type: 'timestamp' })
+  modifiedAt: Date;
 
-  @ManyToOne(() => ProductCategory, (category) => category.id)
-  category: ProductCategory;
+  @ManyToOne(() => Category, (category) => category.products)
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
 
-  @ManyToMany(() => Order, (order) => order.products)
-  orders: Order[];
+  @ManyToMany(() => User, (user) => user.likedProducts)
+  likedBy: User[];
 }
