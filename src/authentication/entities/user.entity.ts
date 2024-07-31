@@ -10,12 +10,7 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-
-export enum UserRole {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
-  GUEST = 'GUEST',
-}
+import { UserRole } from '../enums/user-role.enum';
 
 @Entity()
 export class User {

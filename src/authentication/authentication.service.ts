@@ -24,7 +24,7 @@ export class AuthenticationService {
       where: { username: createUserDto.username },
     });
     if (existingUser) {
-      throw new ConflictException('Username already in use')
+      throw new ConflictException('Username already in use');
     }
     const user = this.usersRepository.create({
       ...createUserDto,

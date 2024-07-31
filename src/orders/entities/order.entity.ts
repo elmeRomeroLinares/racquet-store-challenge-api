@@ -8,12 +8,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { OrderItem } from './order-item.entity';
-
-export enum OrderStatus {
-  PENDING = 'PENDING',
-  COMPLETED = 'COMPLETED',
-  CANCELED = 'CANCELED',
-}
+import { OrderStatus } from '../enums/order-status.enum';
 
 @Entity()
 export class Order {
@@ -29,6 +24,6 @@ export class Order {
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING })
+  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.Pending })
   status: OrderStatus;
 }

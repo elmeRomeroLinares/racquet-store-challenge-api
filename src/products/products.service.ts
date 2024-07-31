@@ -4,33 +4,34 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Timestamp } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateProductCategoryDto } from './dto/create-product-category.dto';
-import { CreateProductCategoryResponseDto } from './dto/create-product-category-response.dto';
-import { ProductCategory } from './entities/category.entity';
+import { Category } from './entities/category.entity';
 import { PaginationQueryDto } from 'src/pagination/dto/pagination-query.dto';
 import { PaginatedResultDto } from 'src/pagination/dto/paginated-result.dto';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
-import { CreateProductResponseDto } from './dto/create-product-response.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { DeleteProductResponseDto } from './dto/delete-product-response.dto';
 import { PaginatedProductsQueryDto } from './dto/paginated-products-query.dto';
+import { User } from 'src/authentication/entities/user.entity';
 
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectRepository(ProductCategory)
-    private readonly productCategoryRepository: Repository<ProductCategory>,
+    @InjectRepository(Category)
+    private readonly productCategoryRepository: Repository<Category>,
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async createProductCategory(
     createProductCategoryDto: CreateProductCategoryDto,
-  ): Promise<CreateProductCategoryResponseDto> {
+  ): Promise<Category> {
     const existingCategory = await this.productCategoryRepository.findOne({
-      where: { categoryName: createProductCategoryDto.categoryName },
+      where: { name: createProductCategoryDto.name },
     });
     if (existingCategory) {
       throw new ConflictException('Category already exists');
@@ -38,14 +39,12 @@ export class ProductsService {
     const category = this.productCategoryRepository.create({
       ...createProductCategoryDto,
     });
-    const newCategory = await this.productCategoryRepository.save(category);
-    return { categoryId: newCategory.id };
+    return await this.productCategoryRepository.save(category);
   }
 
   async getProductCategories(
     paginationQuery: PaginationQueryDto = new PaginationQueryDto(),
-  ): Promise<PaginatedResultDto<ProductCategory>> {
-    console.log('paginationQuery', paginationQuery);
+  ): Promise<PaginatedResultDto<Category>> {
     const { page, limit } = paginationQuery;
     const skip = (page - 1) * limit;
     console.log(skip);
@@ -61,9 +60,7 @@ export class ProductsService {
     };
   }
 
-  async createProduct(
-    createProductDto: CreateProductDto,
-  ): Promise<CreateProductResponseDto> {
+  async createProduct(createProductDto: CreateProductDto): Promise<Product> {
     const category = await this.productCategoryRepository.findOne({
       where: { id: createProductDto.categoryId },
     });
@@ -87,13 +84,11 @@ export class ProductsService {
       name: createProductDto.name,
       price: createProductDto.price,
       category: category,
-      image_url: createProductDto.imageUrl,
+      imageUrl: createProductDto.imageUrl,
       disabled: createProductDto.disabled ?? false,
     });
 
-    const createdProduct = await this.productRepository.save(product);
-
-    return { createdProductId: createdProduct.id };
+    return await this.productRepository.save(product);
   }
 
   async updateProduct(
@@ -120,7 +115,6 @@ export class ProductsService {
     }
 
     Object.assign(product, updateProductDto);
-    product.modified_at = new Date();
     return await this.productRepository.save(product);
   }
 
@@ -141,6 +135,7 @@ export class ProductsService {
       where: categoryId ? { category: { id: categoryId } } : {},
       skip: (page - 1) * limit,
       take: limit,
+      relations: ['category'],
     });
     return {
       data,
@@ -148,5 +143,33 @@ export class ProductsService {
       page,
       limit,
     };
+  }
+
+  async getProduct(productId: string): Promise<Product> {
+    return await this.productRepository.findOneBy({ id: productId });
+  }
+
+  async likeProduct(userId: string, productId: string): Promise<Product[]> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['likedProducts'],
+    });
+
+    console.log(user.likedProducts);
+
+    if (user.likedProducts.some((p) => p.id === productId)) {
+      return user.likedProducts;
+    }
+
+    const product = await this.productRepository.findOneBy({ id: productId });
+
+    if (!user || !product) {
+      throw new Error('User or Product not found');
+    }
+
+    user.likedProducts.push(product);
+    const modifiedUser = await this.userRepository.save(user);
+
+    return modifiedUser.likedProducts;
   }
 }

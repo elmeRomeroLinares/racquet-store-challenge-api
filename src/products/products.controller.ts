@@ -7,25 +7,25 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductCategoryDto } from './dto/create-product-category.dto';
-import { CreateProductCategoryResponseDto } from './dto/create-product-category-response.dto';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorators/roles.decorator';
 import { JwtAuthenticationGuard } from '../authentication/jwt-authentication.guard';
 import { UserRole } from '../authentication/enums/user-role.enum';
-import { ProductCategory } from './entities/category.entity';
+import { Category } from './entities/category.entity';
 import { PaginatedResultDto } from '../pagination/dto/paginated-result.dto';
 import { PaginationQueryDto } from '../pagination/dto/pagination-query.dto';
 import { CreateProductDto } from './dto/create-product.dto';
-import { CreateProductResponseDto } from './dto/create-product-response.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { DeleteProductResponseDto } from './dto/delete-product-response.dto';
 import { PaginatedProductsQueryDto } from './dto/paginated-products-query.dto';
+import { JWTPayload } from 'src/authentication/dto/jwt-payload.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -37,7 +37,7 @@ export class ProductsController {
   async createProductCategory(
     @Body(new ValidationPipe())
     createProductCategoryDto: CreateProductCategoryDto,
-  ): Promise<CreateProductCategoryResponseDto> {
+  ): Promise<Category> {
     return await this.productsService.createProductCategory(
       createProductCategoryDto,
     );
@@ -46,7 +46,7 @@ export class ProductsController {
   @Get('categories')
   async getProductCategories(
     @Query(new ValidationPipe()) query: PaginationQueryDto,
-  ): Promise<PaginatedResultDto<ProductCategory>> {
+  ): Promise<PaginatedResultDto<Category>> {
     const paginationQuery: PaginationQueryDto = {
       page: query.page || 1,
       limit: query.limit || 10,
@@ -60,7 +60,7 @@ export class ProductsController {
   async createProduct(
     @Body(new ValidationPipe())
     createProductDto: CreateProductDto,
-  ): Promise<CreateProductResponseDto> {
+  ): Promise<Product> {
     return await this.productsService.createProduct(createProductDto);
   }
 
@@ -97,5 +97,20 @@ export class ProductsController {
     };
 
     return await this.productsService.getProducts(paginationQuery);
+  }
+
+  @Get('product/:productId')
+  async getProduct(@Param('productId') productId: string): Promise<Product> {
+    return await this.productsService.getProduct(productId);
+  }
+
+  @Post('like/:productId')
+  @UseGuards(JwtAuthenticationGuard)
+  async likeProduct(
+    @Param('productId') productId: string,
+    @Req() req: any,
+  ): Promise<Product[]> {
+    const jwtPayload = req.user as JWTPayload;
+    return await this.productsService.likeProduct(jwtPayload.sub, productId);
   }
 }

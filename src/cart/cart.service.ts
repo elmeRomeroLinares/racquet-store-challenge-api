@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Cart } from './entities/cart.entity';
 import { User } from 'src/authentication/entities/user.entity';
 import { Product } from 'src/products/entities/product.entity';
-import { AddProductsDto } from './dto/add-products.dto';
-import { RemoveProductsDto } from './dto/remove-products.dto';
+import { AddProductToCartDto } from './dto/add-products.dto';
+import { CartItem } from './entities/cart-items.entity';
 
 @Injectable()
 export class CartService {
   constructor(
     @InjectRepository(Cart)
     private readonly cartRepository: Repository<Cart>,
+    @InjectRepository(CartItem)
+    private readonly cartItemRepository: Repository<CartItem>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(Product)
@@ -19,65 +21,56 @@ export class CartService {
   ) {}
 
   async getUserCart(userId: string): Promise<Cart> {
-    const user = await this.userRepository.findOneBy({ id: userId });
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['cart', 'cart.items', 'cart.items.product'],
+    });
     if (!user) {
       throw new Error('User not found');
     }
 
-    // const existingCart = await this.cartRepository.findOneBy({ userId });
-    const userCart = await this.cartRepository.findOne({
-      where: { userId },
-      relations: ['products'],
-    });
-    if (userCart) {
-      console.log('existingCart', userCart);
-      console.log('existingCartProducts', userCart.products);
-      return userCart;
+    if (user.cart) {
+      return user.cart;
     }
 
-    const cart = new Cart();
-    cart.userId = userId;
-
-    return this.cartRepository.save(cart);
+    const cart = this.cartRepository.create({ user });
+    return await this.cartRepository.save(cart);
   }
 
-  async addProducts(
-    addProductsDto: AddProductsDto,
+  async addProduct(
+    addProductToCartDto: AddProductToCartDto,
     userId: string,
   ): Promise<Cart> {
     const userCart = await this.getUserCart(userId);
 
-    const productEntities = await this.productsRepository.find({
-      where: {
-        id: In(addProductsDto.productIds),
-        disabled: false,
-      },
+    const product = await this.productsRepository.findOneBy({
+      id: addProductToCartDto.productId,
     });
 
-    if (productEntities.length !== addProductsDto.productIds.length) {
-      throw new Error('Some products where not found or are disabled');
-    }
-    console.log(userCart.products);
-    if (!userCart.products) {
-      console.log('inside if');
-      userCart.products = [];
+    if (!product || product.disabled) {
+      throw new Error('Product not found or is disabled');
     }
 
-    userCart.products = [...userCart.products, ...productEntities];
-    console.log(userCart.products);
-    return this.cartRepository.save(userCart);
-  }
+    let cartItem = await this.cartItemRepository.findOne({
+      where: { cart: { id: userCart.id }, product: { id: product.id } },
+    });
+    if (cartItem) {
+      cartItem.quantity += addProductToCartDto.quantity;
+    } else {
+      cartItem = this.cartItemRepository.create({
+        cart: userCart,
+        product: product,
+        quantity: addProductToCartDto.quantity,
+      });
+    }
 
-  async removeProducts(
-    removeProductsDto: RemoveProductsDto,
-    userId: string,
-  ): Promise<Cart> {
-    const userCart = await this.getUserCart(userId);
+    await this.cartItemRepository.save(cartItem);
 
-    userCart.products = userCart.products.filter(
-      (product) => !removeProductsDto.productIds.includes(product.id),
-    );
+    const updatedCart = await this.cartRepository.findOne({
+      where: { id: userCart.id },
+      relations: ['items', 'items.product'],
+    });
 
-    return await this.cartRepository.save(userCart);
+    return updatedCart;
   }
 }

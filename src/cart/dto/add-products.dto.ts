@@ -1,8 +1,9 @@
-import { ArrayNotEmpty, IsArray, IsUUID } from 'class-validator';
+import { IsNumber, IsUUID } from 'class-validator';
 
-export class AddProductsDto {
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsUUID('4', { each: true })
-  productIds: string[];
+export class AddProductToCartDto {
+  @IsUUID()
+  productId: string;
+
+  @IsNumber()
+  quantity: number;
 }
