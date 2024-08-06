@@ -4,7 +4,7 @@ import { ProductsService } from './products.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { Product } from './entities/product.entity';
-import { AuthenticationModule } from 'src/authentication/authentication.module';
+import { AuthenticationModule } from '@src/authentication/authentication.module';
 
 @Module({
   imports: [

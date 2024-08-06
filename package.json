@@ -84,7 +84,14 @@
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "src/app.module.ts",
-      "src/main.ts"
-    ]
+      "src/main.ts",
+      "src/data-source.ts",
+      ".dto.ts$",
+      ".module.ts$",
+      "migrations/*"
+    ],
+    "moduleNameMapper": {
+      "^@src/(.*)$": "<rootDir>/$1"
+    }
   }
 }

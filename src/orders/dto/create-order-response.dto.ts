@@ -1,4 +1,4 @@
-import { Product } from 'src/products/entities/product.entity';
+import { Product } from '@src/products/entities/product.entity';
 import { OrderStatus } from '../enums/order-status.enum';
 
 export class CreateOrderResponse {

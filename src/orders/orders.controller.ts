@@ -12,14 +12,14 @@ import {
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { Order } from './entities/order.entity';
-import { JwtAuthenticationGuard } from 'src/authentication/jwt-authentication.guard';
-import { JWTPayload } from 'src/authentication/dto/jwt-payload.dto';
-import { UserRole } from 'src/authentication/enums/user-role.enum';
-import { RolesGuard } from 'src/guards/roles.guard';
-import { Roles } from 'src/decorators/roles.decorator';
+import { JwtAuthenticationGuard } from '@src/authentication/jwt-authentication.guard';
+import { JWTPayload } from '@src/authentication/dto/jwt-payload.dto';
+import { UserRole } from '@src/authentication/enums/user-role.enum';
+import { RolesGuard } from '@src/guards/roles.guard';
+import { Roles } from '@src/decorators/roles.decorator';
 import { OrderStatus } from './enums/order-status.enum';
-import { PaginatedResultDto } from 'src/pagination/dto/paginated-result.dto';
-import { PaginationQueryDto } from 'src/pagination/dto/pagination-query.dto';
+import { PaginatedResultDto } from '@src/pagination/dto/paginated-result.dto';
+import { PaginationQueryDto } from '@src/pagination/dto/pagination-query.dto';
 
 @Controller('orders')
 export class OrdersController {

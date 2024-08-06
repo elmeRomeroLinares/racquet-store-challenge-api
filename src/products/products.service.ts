@@ -7,14 +7,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateProductCategoryDto } from './dto/create-product-category.dto';
 import { Category } from './entities/category.entity';
-import { PaginationQueryDto } from 'src/pagination/dto/pagination-query.dto';
-import { PaginatedResultDto } from 'src/pagination/dto/paginated-result.dto';
+import { PaginationQueryDto } from '@src/pagination/dto/pagination-query.dto';
+import { PaginatedResultDto } from '@src/pagination/dto/paginated-result.dto';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { DeleteProductResponseDto } from './dto/delete-product-response.dto';
 import { PaginatedProductsQueryDto } from './dto/paginated-products-query.dto';
-import { User } from 'src/authentication/entities/user.entity';
+import { User } from '@src/authentication/entities/user.entity';
 
 @Injectable()
 export class ProductsService {
@@ -47,7 +47,6 @@ export class ProductsService {
   ): Promise<PaginatedResultDto<Category>> {
     const { page, limit } = paginationQuery;
     const skip = (page - 1) * limit;
-    console.log(skip);
     const [data, total] = await this.productCategoryRepository.findAndCount({
       skip: skip,
       take: limit,
@@ -154,8 +153,6 @@ export class ProductsService {
       where: { id: userId },
       relations: ['likedProducts'],
     });
-
-    console.log(user.likedProducts);
 
     if (user.likedProducts.some((p) => p.id === productId)) {
       return user.likedProducts;

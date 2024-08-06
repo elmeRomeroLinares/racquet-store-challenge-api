@@ -1,11 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as dotenv from 'dotenv';
 import { SignUpUserResponseDto } from './dto/signup-user-response.dto';
 import { UserRole } from './enums/user-role.enum';
+import { User } from './entities/user.entity';
+import { SignInUserDto } from './dto/signin-user.dto';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Cart } from '@src/cart/entities/cart.entity';
+import { Order } from '@src/orders/entities/order.entity';
+import { Product } from '@src/products/entities/product.entity';
 
 dotenv.config();
 
@@ -21,7 +28,21 @@ describe('AuthenticationController', () => {
           provide: AuthenticationService,
           useValue: {
             signUp: jest.fn(),
+            validateUser: jest.fn(),
+            createAccessToken: jest.fn(),
           },
+        },
+        {
+          provide: getRepositoryToken(Cart),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Order),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Product),
+          useClass: Repository,
         },
       ],
     }).compile();
@@ -82,25 +103,46 @@ describe('AuthenticationController', () => {
         authenticationController.signUp(createUserDto, 'wrong-key'),
       ).rejects.toThrow(ForbiddenException);
     });
+  });
+  describe('signIn', () => {
+    it('should return an access token if credentials are valid', async () => {
+      const signInUserDto: SignInUserDto = {
+        username: 'testuser',
+        password: 'testpassword',
+      };
 
-    // it('should throw an error if extra data is provided', async () => {
-    //   const createUserDto: any = {
-    //     username: 'testuser',
-    //     password: 'testpass',
-    //     extraField: 'extra',
-    //   };
+      const user: User = {
+        id: '1',
+        username: 'testuser',
+        password: 'hashedpassword',
+        role: UserRole.Customer,
+        createdAt: new Date(),
+        cart: null,
+        orders: [],
+        likedProducts: [],
+      };
 
-    //   await expect(
-    //     authenticationController.signUp(createUserDto, 'customer-key'),
-    //   ).rejects.toThrow(BadRequestException);
-    // });
+      jest.spyOn(authenticationService, 'validateUser').mockResolvedValue(user);
+      jest
+        .spyOn(authenticationService, 'createAccessToken')
+        .mockResolvedValue('access_token');
 
-    // it('should throw an error if incorrect data is provided', async () => {
-    //   const createUserDto: any = { user: 'testuser', pass: 'testpass' };
+      const result = await authenticationController.signIn(signInUserDto);
 
-    //   await expect(
-    //     authenticationController.signUp(createUserDto, 'customer-key'),
-    //   ).rejects.toThrow(BadRequestException);
-    // });
+      expect(result).toEqual({ accessToken: 'access_token' });
+    });
+
+    it('should throw UnauthorizedException if credentials are invalid', async () => {
+      const signInUserDto: SignInUserDto = {
+        username: 'testuser',
+        password: 'testpassword',
+      };
+
+      jest.spyOn(authenticationService, 'validateUser').mockResolvedValue(null);
+
+      await expect(
+        authenticationController.signIn(signInUserDto),
+      ).rejects.toThrow(UnauthorizedException);
+    });
   });
 });

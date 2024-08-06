@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
-import { CartService } from 'src/cart/cart.service';
+import { CartService } from '@src/cart/cart.service';
 import { OrderItem } from './entities/order-item.entity';
-import { CartItem } from 'src/cart/entities/cart-items.entity';
+import { CartItem } from '@src/cart/entities/cart-items.entity';
 import { OrderStatus } from './enums/order-status.enum';
-import { PaginatedResultDto } from 'src/pagination/dto/paginated-result.dto';
-import { PaginationQueryDto } from 'src/pagination/dto/pagination-query.dto';
-import { User } from 'src/authentication/entities/user.entity';
+import { PaginatedResultDto } from '@src/pagination/dto/paginated-result.dto';
+import { PaginationQueryDto } from '@src/pagination/dto/pagination-query.dto';
+import { User } from '@src/authentication/entities/user.entity';
 
 @Injectable()
 export class OrdersService {

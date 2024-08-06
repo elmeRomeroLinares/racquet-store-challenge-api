@@ -1,4 +1,4 @@
-import { User } from 'src/authentication/entities/user.entity';
+import { User } from '@src/authentication/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

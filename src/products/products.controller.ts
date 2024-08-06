@@ -25,7 +25,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { DeleteProductResponseDto } from './dto/delete-product-response.dto';
 import { PaginatedProductsQueryDto } from './dto/paginated-products-query.dto';
-import { JWTPayload } from 'src/authentication/dto/jwt-payload.dto';
+import { JWTPayload } from '@src/authentication/dto/jwt-payload.dto';
 
 @Controller('products')
 export class ProductsController {

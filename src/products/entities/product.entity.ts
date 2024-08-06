@@ -9,7 +9,7 @@ import {
   ManyToMany,
 } from 'typeorm';
 import { Category } from './category.entity';
-import { User } from 'src/authentication/entities/user.entity';
+import { User } from '@src/authentication/entities/user.entity';
 
 @Entity()
 export class Product {
