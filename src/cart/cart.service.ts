@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cart } from './entities/cart.entity';
@@ -26,7 +30,7 @@ export class CartService {
       relations: ['cart', 'cart.items', 'cart.items.product'],
     });
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     if (user.cart) {
@@ -48,7 +52,7 @@ export class CartService {
     });
 
     if (!product || product.disabled) {
-      throw new Error('Product not found or is disabled');
+      throw new NotFoundException('Product not found or is disabled');
     }
 
     let cartItem = await this.cartItemRepository.findOne({
@@ -62,6 +66,12 @@ export class CartService {
         product: product,
         quantity: addProductToCartDto.quantity,
       });
+    }
+
+    if (product.inventoryLevel < cartItem.quantity) {
+      throw new ConflictException(
+        `Product ${product.name} is out of stock, current stock is ${product.inventoryLevel}`,
+      );
     }
 
     await this.cartItemRepository.save(cartItem);

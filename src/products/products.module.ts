@@ -13,6 +13,6 @@ import { AuthenticationModule } from '@src/authentication/authentication.module'
   ],
   controllers: [ProductsController],
   providers: [ProductsService],
-  exports: [TypeOrmModule],
+  exports: [ProductsService, TypeOrmModule],
 })
 export class ProductsModule {}

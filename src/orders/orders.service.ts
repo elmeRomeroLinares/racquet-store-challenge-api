@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
@@ -9,6 +9,8 @@ import { OrderStatus } from './enums/order-status.enum';
 import { PaginatedResultDto } from '@src/pagination/dto/paginated-result.dto';
 import { PaginationQueryDto } from '@src/pagination/dto/pagination-query.dto';
 import { User } from '@src/authentication/entities/user.entity';
+import { Product } from '@src/products/entities/product.entity';
+import { ProductsService } from '@src/products/products.service';
 
 @Injectable()
 export class OrdersService {
@@ -22,12 +24,20 @@ export class OrdersService {
     @InjectRepository(CartItem)
     private readonly cartItemRepository: Repository<CartItem>,
     private readonly cartService: CartService,
+    private readonly productsService: ProductsService,
   ) {}
 
   async createOrderFromCart(userId: string) {
     const userCart = await this.cartService.getUserCart(userId);
     if (!userCart || userCart.items.length === 0) {
       throw new Error('Cart is empty');
+    }
+
+    const outOfStockProducts = await this.getOutOfStockProducts(userCart.items);
+    if (outOfStockProducts.length != 0) {
+      throw new ConflictException(
+        `Products: ${outOfStockProducts.join()} are out of stock`,
+      );
     }
 
     const user = await this.userRepository.findOneBy({ id: userId });
@@ -38,6 +48,12 @@ export class OrdersService {
     await this.ordersRepository.save(order);
 
     for (const cartItem of userCart.items) {
+      const product = cartItem.product;
+      const newInventoryLevel = product.inventoryLevel - cartItem.quantity;
+      await this.productsService.updateInventoryLevel(
+        product.id,
+        newInventoryLevel,
+      );
       const orderItem = this.orderItemRepository.create({
         order,
         product: cartItem.product,
@@ -52,6 +68,12 @@ export class OrdersService {
       where: { id: order.id },
       relations: ['items', 'items.product'],
     });
+  }
+
+  async getOutOfStockProducts(cartItems: CartItem[]): Promise<Product[]> {
+    return cartItems
+      .filter((cartItem) => cartItem.product.inventoryLevel < cartItem.quantity)
+      .map((cartItem) => cartItem.product);
   }
 
   async updateOrderStatus(orderId: string, status: OrderStatus) {

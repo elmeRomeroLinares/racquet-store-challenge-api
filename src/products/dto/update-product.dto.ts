@@ -27,4 +27,8 @@ export class UpdateProductDto {
   @IsBoolean()
   @IsOptional()
   disabled?: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  inventoryLevel?: number;
 }

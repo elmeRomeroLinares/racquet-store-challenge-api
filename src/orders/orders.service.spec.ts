@@ -9,6 +9,7 @@ import { CartItem } from '@src/cart/entities/cart-items.entity';
 import { CartService } from '@src/cart/cart.service';
 import { OrderStatus } from './enums/order-status.enum';
 import { PaginationQueryDto } from '@src/pagination/dto/pagination-query.dto';
+import { ProductsService } from '@src/products/products.service';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -42,6 +43,12 @@ describe('OrdersService', () => {
           provide: CartService,
           useValue: {
             getUserCart: jest.fn(),
+          },
+        },
+        {
+          provide: ProductsService,
+          useValue: {
+            updateInventoryLevel: jest.fn(),
           },
         },
       ],

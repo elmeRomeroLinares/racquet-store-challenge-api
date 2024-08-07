@@ -85,6 +85,7 @@ export class ProductsService {
       category: category,
       imageUrl: createProductDto.imageUrl,
       disabled: createProductDto.disabled ?? false,
+      inventoryLevel: createProductDto.invenotryLevel ?? 0,
     });
 
     return await this.productRepository.save(product);
@@ -161,12 +162,24 @@ export class ProductsService {
     const product = await this.productRepository.findOneBy({ id: productId });
 
     if (!user || !product) {
-      throw new Error('User or Product not found');
+      throw new NotFoundException('User or Product not found');
     }
 
     user.likedProducts.push(product);
     const modifiedUser = await this.userRepository.save(user);
 
     return modifiedUser.likedProducts;
+  }
+
+  async updateInventoryLevel(
+    productId: string,
+    newInventoryLevel: number,
+  ): Promise<Product> {
+    if (newInventoryLevel < 0) {
+      throw new Error('Inventory level bellow 0');
+    }
+    const product = await this.getProduct(productId);
+    product.inventoryLevel = newInventoryLevel;
+    return await this.productRepository.save(product);
   }
 }

@@ -40,4 +40,7 @@ export class Product {
 
   @ManyToMany(() => User, (user) => user.likedProducts)
   likedBy: User[];
+
+  @Column({ default: 0 })
+  inventoryLevel: number;
 }

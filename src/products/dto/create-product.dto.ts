@@ -24,4 +24,8 @@ export class CreateProductDto {
   @IsBoolean()
   @IsOptional()
   disabled?: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  invenotryLevel?: number;
 }
