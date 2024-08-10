@@ -48,4 +48,8 @@ export class AuthenticationService {
     const payload: JWTPayload = { sub: userId, role: userRole };
     return this.jwtService.sign(payload);
   }
+
+  async getUsers(): Promise<User[]> {
+    return this.usersRepository.find();
+  }
 }

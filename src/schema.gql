@@ -1,0 +1,43 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: String!
+  username: String!
+  role: String!
+}
+
+type SignUpUserResponseDto {
+  createdUserUuid: String!
+  role: UserRole!
+}
+
+enum UserRole {
+  Admin
+  Customer
+}
+
+type SignInUserResponse {
+  accessToken: String!
+}
+
+type Query {
+  getUsers: [User!]!
+}
+
+type Mutation {
+  signUp(createUserInput: CreateUserDto!, storeKey: String): SignUpUserResponseDto!
+  signIn(signInUserInput: SignInUserDto!): SignInUserResponse!
+}
+
+input CreateUserDto {
+  username: String!
+  password: String!
+  role: String
+}
+
+input SignInUserDto {
+  username: String!
+  password: String!
+}

@@ -11,18 +11,23 @@ import {
   JoinTable,
 } from 'typeorm';
 import { UserRole } from '../enums/user-role.enum';
+import { Field, ObjectType } from '@nestjs/graphql';
 
+@ObjectType()
 @Entity()
 export class User {
+  @Field()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Field()
   @Column({ unique: true })
   username: string;
 
   @Column()
   password: string;
 
+  @Field()
   @Column({ type: 'enum', enum: UserRole })
   role: UserRole;
 
