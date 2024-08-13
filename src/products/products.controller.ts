@@ -15,7 +15,7 @@ import { ProductsService } from './products.service';
 import { CreateProductCategoryDto } from './dto/create-product-category.dto';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorators/roles.decorator';
-import { JwtAuthenticationGuard } from '../authentication/jwt-authentication.guard';
+import { JwtAuthenticationGuard } from '../authentication/jwt/jwt-authentication.guard';
 import { UserRole } from '../authentication/enums/user-role.enum';
 import { Category } from './entities/category.entity';
 import { PaginatedResultDto } from '../pagination/dto/paginated-result.dto';

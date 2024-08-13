@@ -5,8 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtStrategy } from './jwt.strategy';
-import { JwtAuthenticationGuard } from './jwt-authentication.guard';
+import { JwtStrategy } from './jwt/jwt.strategy';
+import { JwtAuthenticationGuard } from './jwt/jwt-authentication.guard';
 
 @Module({
   imports: [

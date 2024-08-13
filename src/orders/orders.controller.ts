@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { Order } from './entities/order.entity';
-import { JwtAuthenticationGuard } from '@src/authentication/jwt-authentication.guard';
+import { JwtAuthenticationGuard } from '@src/authentication/jwt/jwt-authentication.guard';
 import { JWTPayload } from '@src/authentication/dto/jwt-payload.dto';
 import { UserRole } from '@src/authentication/enums/user-role.enum';
 import { RolesGuard } from '@src/guards/roles.guard';

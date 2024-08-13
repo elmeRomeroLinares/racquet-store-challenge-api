@@ -2,6 +2,11 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type CartItem {
+  id: String!
+  quantity: Float!
+}
+
 type User {
   id: String!
   username: String!
@@ -22,13 +27,28 @@ type SignInUserResponse {
   accessToken: String!
 }
 
+type CartDTO {
+  id: String!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  userId: String!
+  cartIems: [CartItem!]!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Query {
   getUsers: [User!]!
+  getUserCart(userId: String): CartDTO!
 }
 
 type Mutation {
   signUp(createUserInput: CreateUserDto!, storeKey: String): SignUpUserResponseDto!
   signIn(signInUserInput: SignInUserDto!): SignInUserResponse!
+  addProductToCart(addProductToCartDto: AddProductToCartDto!, userId: String): CartDTO!
 }
 
 input CreateUserDto {
@@ -40,4 +60,9 @@ input CreateUserDto {
 input SignInUserDto {
   username: String!
   password: String!
+}
+
+input AddProductToCartDto {
+  productId: String!
+  quantity: Int!
 }

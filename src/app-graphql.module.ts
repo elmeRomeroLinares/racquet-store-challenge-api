@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { AuthenticationGraphQlModule } from './authentication/authentication-graphql.module';
+import { AuthenticationGraphQlModule } from './authentication/graphql/authentication-graphql.module';
 import { ProductsModule } from './products/products.module';
 import { dataSourceOptions } from './data-source';
 import { OrdersModule } from './orders/orders.module';
@@ -9,6 +9,7 @@ import { CartModule } from './cart/cart.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { CartGraphQlModule } from './cart/graphql/cart-graphql.module';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { join } from 'path';
     AuthenticationGraphQlModule,
     // ProductsModule,
     // OrdersModule,
-    // CartModule,
+    CartGraphQlModule,
   ],
 })
 export class AppGraphModule {}

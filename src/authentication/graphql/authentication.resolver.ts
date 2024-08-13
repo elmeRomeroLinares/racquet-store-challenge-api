@@ -1,24 +1,18 @@
 import {
-  Controller,
-  Post,
-  Body,
-  ValidationPipe,
-  Headers,
   ForbiddenException,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { AuthenticationService } from './authentication.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UserRole } from './enums/user-role.enum';
-import { SignUpUserResponseDto } from './dto/signup-user-response.dto';
-import { SignInUserDto } from './dto/signin-user.dto';
-import { SignInUserResponse } from './dto/signin-user-response.dto';
+import { AuthenticationService } from '../authentication.service';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UserRole } from '../enums/user-role.enum';
+import { SignUpUserResponseDto } from '../dto/signup-user-response.dto';
+import { SignInUserDto } from '../dto/signin-user.dto';
+import { SignInUserResponse } from '../dto/signin-user-response.dto';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { User } from './entities/user.entity';
+import { User } from '../entities/user.entity';
 import { RolesGuard } from '@src/guards/roles.guard';
-import { Admin } from 'typeorm';
-import { JwtAuthenticationGuard } from './jwt-authentication.guard';
+import { JwtAuthenticationGuard } from '../jwt/jwt-authentication.guard';
 import { Roles } from '@src/decorators/roles.decorator';
 
 @Resolver()

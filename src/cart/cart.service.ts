@@ -38,6 +38,7 @@ export class CartService {
     }
 
     const cart = this.cartRepository.create({ user });
+    cart.items = [];
     return await this.cartRepository.save(cart);
   }
 
