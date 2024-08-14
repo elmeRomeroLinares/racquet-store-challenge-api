@@ -11,6 +11,7 @@ import { PaginationQueryDto } from '@src/pagination/dto/pagination-query.dto';
 import { User } from '@src/authentication/entities/user.entity';
 import { Product } from '@src/products/entities/product.entity';
 import { ProductsService } from '@src/products/products.service';
+import { OrderDTO } from './dto/order.dto';
 
 @Injectable()
 export class OrdersService {
@@ -85,7 +86,7 @@ export class OrdersService {
   async getOrder(orderId: string): Promise<Order> {
     const order = await this.ordersRepository.findOne({
       where: { id: orderId },
-      relations: ['items', 'items.product'],
+      relations: ['items', 'items.product', 'user'],
     });
     if (!order) {
       throw new Error('Order not found');
@@ -96,7 +97,7 @@ export class OrdersService {
   async getUserOrders(userId: string): Promise<Order[]> {
     return this.ordersRepository.find({
       where: { user: { id: userId } },
-      relations: ['items', 'items.product'],
+      relations: ['items', 'items.product', 'user'],
     });
   }
 
@@ -114,5 +115,26 @@ export class OrdersService {
       page,
       limit,
     };
+  }
+
+  async getOrdersWithTotal(
+    page: number,
+    limit: number,
+  ): Promise<[OrderDTO[], number]> {
+    const [data, total] = await this.ordersRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      relations: ['items', 'user'],
+    });
+    const orderDTOs: OrderDTO[] = data.map((order) => {
+      return {
+        id: order.id,
+        userId: order.user.id,
+        createdAt: order.createdAt,
+        orderItems: order.items,
+        orderStatus: order.status,
+      };
+    });
+    return [orderDTOs, total];
   }
 }

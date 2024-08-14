@@ -7,6 +7,11 @@ type CartItem {
   quantity: Float!
 }
 
+type OrderItem {
+  id: String!
+  quantity: Int!
+}
+
 type User {
   id: String!
   username: String!
@@ -40,14 +45,41 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type OrderDTO {
+  id: String!
+  userId: String!
+  orderItems: [OrderItem!]!
+  createdAt: DateTime!
+  orderStatus: OrderStatus!
+}
+
+enum OrderStatus {
+  Pending
+  Shipped
+  Delivered
+  Cancelled
+}
+
 type Query {
   getUsers: [User!]!
+  getOrder(orderId: String!): OrderDTO!
+  getOrders(userId: String): [OrderDTO!]!
+  getAllOrders(page: Int, limit: Int): PaginatedResultType!
   getUserCart(userId: String): CartDTO!
+}
+
+type PaginatedResultType {
+  data: [OrderDTO!]
+  total: Int!
+  page: Int!
+  limit: Int!
 }
 
 type Mutation {
   signUp(createUserInput: CreateUserDto!, storeKey: String): SignUpUserResponseDto!
   signIn(signInUserInput: SignInUserDto!): SignInUserResponse!
+  createOrderFromCart(userId: String): OrderDTO!
+  updateOrderStatus(orderId: String!, orderStatus: OrderStatus!): OrderDTO!
   addProductToCart(addProductToCartDto: AddProductToCartDto!, userId: String): CartDTO!
 }
 

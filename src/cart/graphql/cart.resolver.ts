@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { CartService } from '../cart.service';
 import { AddProductToCartDto } from '../dto/add-products.dto';
-import { Cart } from '../entities/cart.entity';
 import { JwtAuthenticationGuard } from '@src/authentication/jwt/jwt-authentication.guard';
 import { UserRole } from '@src/authentication/enums/user-role.enum';
 import { JWTPayload } from '@src/authentication/dto/jwt-payload.dto';

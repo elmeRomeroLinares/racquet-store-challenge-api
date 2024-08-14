@@ -1,9 +1,12 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
 import { Order } from './order.entity';
 import { Product } from '@src/products/entities/product.entity';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
+@ObjectType()
 @Entity()
 export class OrderItem {
+  @Field()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -14,6 +17,7 @@ export class OrderItem {
   @ManyToOne(() => Product, { onDelete: 'CASCADE' })
   product: Product;
 
+  @Field(() => Int)
   @Column()
   quantity: number;
 }

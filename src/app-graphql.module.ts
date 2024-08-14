@@ -10,6 +10,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { CartGraphQlModule } from './cart/graphql/cart-graphql.module';
+import { OrdersGraphQlModule } from './orders/graphql/orders-graphql.module';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { CartGraphQlModule } from './cart/graphql/cart-graphql.module';
     TypeOrmModule.forRoot(dataSourceOptions),
     AuthenticationGraphQlModule,
     // ProductsModule,
-    // OrdersModule,
+    OrdersGraphQlModule,
     CartGraphQlModule,
   ],
 })
