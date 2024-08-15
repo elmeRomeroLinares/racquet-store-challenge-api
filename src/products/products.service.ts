@@ -97,6 +97,7 @@ export class ProductsService {
   ): Promise<Product> {
     const product = await this.productRepository.findOne({
       where: { id: productId },
+      relations: ['category'],
     });
     if (!product) {
       throw new NotFoundException(`Product with ID ${productId} not found`);
@@ -146,20 +147,26 @@ export class ProductsService {
   }
 
   async getProduct(productId: string): Promise<Product> {
-    return await this.productRepository.findOneBy({ id: productId });
+    return await this.productRepository.findOne({
+      where: { id: productId },
+      relations: ['category'],
+    });
   }
 
   async likeProduct(userId: string, productId: string): Promise<Product[]> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['likedProducts'],
+      relations: ['likedProducts', 'likedProducts.category'],
     });
 
     if (user.likedProducts.some((p) => p.id === productId)) {
       return user.likedProducts;
     }
 
-    const product = await this.productRepository.findOneBy({ id: productId });
+    const product = await this.productRepository.findOne({
+      where: { id: productId },
+      relations: ['category'],
+    });
 
     if (!user || !product) {
       throw new NotFoundException('User or Product not found');

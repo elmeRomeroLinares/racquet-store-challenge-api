@@ -10,8 +10,9 @@ import { OrderStatus } from '../enums/order-status.enum';
 import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { OrderDTO } from '../dto/order.dto';
 import { GraphQlPaginatedResult } from '@src/pagination/dto/graphql-paginated-result.dto';
+import { OrderMapper } from '../mappers/order-mapper';
 
-const PaginatedOrderResult = GraphQlPaginatedResult(OrderDTO);
+const PaginatedOrderResult = GraphQlPaginatedResult(OrderDTO, 'Order');
 
 @Resolver()
 export class OrdersResolver {
@@ -92,13 +93,7 @@ export class OrdersResolver {
     const orders = await this.ordersService.getUserOrders(targetUserId);
 
     const orderDTOs: OrderDTO[] = orders.map((order) => {
-      return {
-        id: order.id,
-        userId: order.user.id,
-        orderItems: order.items,
-        createdAt: order.createdAt,
-        orderStatus: order.status,
-      };
+      return OrderMapper.toDTO(order);
     });
 
     return orderDTOs;

@@ -1,7 +1,10 @@
 import { Field, ObjectType, Int } from '@nestjs/graphql';
 
-export function GraphQlPaginatedResult<T>(classRef: new () => T): any {
-  @ObjectType({ isAbstract: true })
+export function GraphQlPaginatedResult<T>(
+  classRef: new () => T,
+  name: string,
+): any {
+  @ObjectType(`${name}PaginatedResult`)
   abstract class PaginatedResultType {
     @Field(() => [classRef], { nullable: true })
     data: T[];

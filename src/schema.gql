@@ -2,6 +2,17 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Category {
+  id: String!
+  name: String!
+  createdAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type CartItem {
   id: String!
   quantity: Float!
@@ -32,6 +43,40 @@ type SignInUserResponse {
   accessToken: String!
 }
 
+type DeleteProductResponseDto {
+  affectedRows: Int!
+}
+
+type ProductDTO {
+  id: String!
+  name: String!
+  price: Float!
+  imageUrl: String
+  disabled: Boolean!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  categoryId: String!
+  inventoryLevel: Int!
+}
+
+type LikeProductResponseDto {
+  likedProductsByUser: [ProductDTO!]!
+}
+
+type CategoryPaginatedResult {
+  data: [Category!]
+  total: Int!
+  page: Int!
+  limit: Int!
+}
+
+type ProductPaginatedResult {
+  data: [ProductDTO!]
+  total: Int!
+  page: Int!
+  limit: Int!
+}
+
 type CartDTO {
   id: String!
   createdAt: DateTime!
@@ -39,11 +84,6 @@ type CartDTO {
   userId: String!
   cartIems: [CartItem!]!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type OrderDTO {
   id: String!
@@ -60,24 +100,32 @@ enum OrderStatus {
   Cancelled
 }
 
-type Query {
-  getUsers: [User!]!
-  getOrder(orderId: String!): OrderDTO!
-  getOrders(userId: String): [OrderDTO!]!
-  getAllOrders(page: Int, limit: Int): PaginatedResultType!
-  getUserCart(userId: String): CartDTO!
-}
-
-type PaginatedResultType {
+type OrderPaginatedResult {
   data: [OrderDTO!]
   total: Int!
   page: Int!
   limit: Int!
 }
 
+type Query {
+  getUsers: [User!]!
+  getCategories(page: Int, limit: Int): CategoryPaginatedResult!
+  getProducts(page: Int, limit: Int, categoryId: String): ProductPaginatedResult!
+  getProductDetail(productId: String!): ProductDTO!
+  getOrder(orderId: String!): OrderDTO!
+  getOrders(userId: String): [OrderDTO!]!
+  getAllOrders(page: Int, limit: Int): OrderPaginatedResult!
+  getUserCart(userId: String): CartDTO!
+}
+
 type Mutation {
   signUp(createUserInput: CreateUserDto!, storeKey: String): SignUpUserResponseDto!
   signIn(signInUserInput: SignInUserDto!): SignInUserResponse!
+  createCategory(createCategoryDto: CreateProductCategoryDto!): Category!
+  createProduct(createProductDto: CreateProductDto!): ProductDTO!
+  updateProduct(productId: String!, updateProductDto: UpdateProductDto!): ProductDTO!
+  deleteProduct(productId: String!): DeleteProductResponseDto!
+  likeProduct(productId: String!): LikeProductResponseDto!
   createOrderFromCart(userId: String): OrderDTO!
   updateOrderStatus(orderId: String!, orderStatus: OrderStatus!): OrderDTO!
   addProductToCart(addProductToCartDto: AddProductToCartDto!, userId: String): CartDTO!
@@ -92,6 +140,28 @@ input CreateUserDto {
 input SignInUserDto {
   username: String!
   password: String!
+}
+
+input CreateProductCategoryDto {
+  name: String!
+}
+
+input CreateProductDto {
+  name: String!
+  price: Float!
+  categoryId: String!
+  imageUrl: String
+  disabled: Boolean
+  invenotryLevel: Int
+}
+
+input UpdateProductDto {
+  name: String
+  price: Float
+  categoryId: String
+  imageUrl: String
+  disabled: Boolean
+  inventoryLevel: Int
 }
 
 input AddProductToCartDto {
