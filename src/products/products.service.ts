@@ -15,6 +15,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { DeleteProductResponseDto } from './dto/delete-product-response.dto';
 import { PaginatedProductsQueryDto } from './dto/paginated-products-query.dto';
 import { User } from '@src/authentication/entities/user.entity';
+import { ImageService } from './image.service';
 
 @Injectable()
 export class ProductsService {
@@ -25,6 +26,7 @@ export class ProductsService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly imageService: ImageService,
   ) {}
 
   async createProductCategory(
@@ -124,6 +126,7 @@ export class ProductsService {
       throw new NotFoundException(`Product with ID ${productId} not found`);
     }
 
+    await this.imageService.deleteProductImage(productId);
     return { affectedRows: result.affected };
   }
 
@@ -146,7 +149,11 @@ export class ProductsService {
   }
 
   async getProduct(productId: string): Promise<Product> {
-    return await this.productRepository.findOneBy({ id: productId });
+    const product = await this.productRepository.findOneBy({ id: productId });
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    return product;
   }
 
   async likeProduct(userId: string, productId: string): Promise<Product[]> {

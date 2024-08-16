@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { Product } from './entities/product.entity';
 import { AuthenticationModule } from '@src/authentication/authentication.module';
+import { ImageService } from './image.service';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { AuthenticationModule } from '@src/authentication/authentication.module'
     AuthenticationModule,
   ],
   controllers: [ProductsController],
-  providers: [ProductsService],
+  providers: [ProductsService, ImageService],
   exports: [ProductsService, TypeOrmModule],
 })
 export class ProductsModule {}

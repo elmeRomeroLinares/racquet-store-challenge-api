@@ -2,13 +2,18 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Post,
   Put,
   Query,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
@@ -26,10 +31,17 @@ import { Product } from './entities/product.entity';
 import { DeleteProductResponseDto } from './dto/delete-product-response.dto';
 import { PaginatedProductsQueryDto } from './dto/paginated-products-query.dto';
 import { JWTPayload } from '@src/authentication/dto/jwt-payload.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageService } from './image.service';
+
+const MAX_FILE_SIZE = 1e7;
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly imageService: ImageService,
+  ) {}
 
   @Post('category')
   @UseGuards(JwtAuthenticationGuard, RolesGuard)
@@ -112,5 +124,32 @@ export class ProductsController {
   ): Promise<Product[]> {
     const jwtPayload = req.user as JWTPayload;
     return await this.productsService.likeProduct(jwtPayload.sub, productId);
+  }
+
+  @Post('product/:productId/image')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(UserRole.Admin)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProductImage(
+    @Param('productId') productId: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+          new MaxFileSizeValidator({
+            maxSize: MAX_FILE_SIZE, // 10MB
+            message: 'File is too large. Max file size is 10MB',
+          }),
+        ],
+        fileIsRequired: true,
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    const product = await this.productsService.getProduct(productId);
+    const fileUrl = await this.imageService.uploadImage(file, product.id);
+    return await this.productsService.updateProduct(product.id, {
+      imageUrl: fileUrl.url,
+    });
   }
 }
